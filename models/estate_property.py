@@ -58,6 +58,8 @@ class EstateProperty(models.Model):
 
      best_price = fields.Float(string='Best Price',compute='_compute_best_price')
 
+
+
      @api.constrains('facades')
      def check_facades(self):
           for record in self:
@@ -74,3 +76,13 @@ class EstateProperty(models.Model):
           for record in self:
                prices = record.offer_ids.mapped('price')
                record.best_price = max(prices) if prices else 0.0
+
+
+     @api.onchange('garden')
+     def _compute_garden(self):
+               if self.garden == True :
+                    self.garden_area = 10
+                    self.garden_orientation = 'north'
+               else :
+                    self.garden_area = 0
+                    self.garden_orientation = False
