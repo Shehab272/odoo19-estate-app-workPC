@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+from odoo.exceptions import UserError
 
 from odoo.exceptions import ValidationError
 
@@ -37,3 +38,24 @@ class EstatePropertyOffer(models.Model):
                if record.date_deadline:
                     delta = record.date_deadline - start_date
                     record.validity = delta.days
+
+     def action_accept(self):
+          for record in self:
+               # الشرط الهام: التأكد من عدم وجود عرض مقبول مسبقاً لنفس العقار
+               accepted_offer = record.property_id.offer_ids.filtered(lambda o: o.status == 'accepted')
+               if accepted_offer:
+                    raise UserError("An offer has already been accepted for this property!")
+
+               # 1. تغيير حالة العرض الحالي إلى مقبول
+               record.status = 'accepted'
+
+               # 2. تحديث سعر البيع والمشتري وحالة العقار المرتبط
+               record.property_id.selling_price = record.price
+               record.property_id.buyer_id = record.partner_id
+               record.property_id.state = 'accepted'
+          return True
+
+     def action_refuse(self):
+          for record in self:
+               record.status = 'refused'
+          return True
