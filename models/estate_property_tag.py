@@ -9,3 +9,5 @@ class estate_property_tag(models.Model):
     _description = 'Estate Property Tag'
 
     name = fields.Char(string='Name', required=True)
+
+    _order = "name"
