@@ -6,16 +6,17 @@
       <field name="name">Estate Property List</field>
       <field name="model">estate.property</field>
       <field name="arch" type="xml">
-        <list string="Properties" multi_edit="1">
+        <list string="Properties" decoration-bf="state == 'accepted'" decoration-success="state == 'accepted'"
+              decoration-muted="state == 'sold'">
           <field name="name" string="Title"/>
           <field name="postcode"/>
           <field name="property_type_id"/>
-          <field name="date_availability" string="Available From"/>
+          <field name="date_availability" string="Available From" optional="hide"/>
           <field name="expected_price"/>
           <field name="selling_price"/>
           <field name="state" widget="badge" decoration-success="state == 'sold'"
                  decoration-info="state == 'new' or state == 'offer_received'"
-                 decoration-muted="state == 'canceled'"/>
+                 decoration-muted="state == 'canceled'" column_invisible="1"/>
           <field name="best_price"/>
           <field name="tag_ids" widget="many2many_tags"/>
         </list>
@@ -29,8 +30,8 @@
       <field name="arch" type="xml">
         <form>
           <header>
-              <button name="action_sold" type="object" string="Sold" class="oe_highlight"/>
-              <button name="action_cancel" type="object" string="Cancel"/>
+              <button name="action_sold" type="object" string="Sold" class="oe_highlight" invisible="state in ('sold','canceled')"/>
+              <button name="action_cancel" type="object" string="Cancel" class="oe_highlight" invisible="state in ('sold', 'canceled')"/>
               <field name="state" widget="statusbar" statusbar_visible="new,offer_received,offer_accepted,sold"/>
           </header>
           <sheet>
@@ -53,15 +54,15 @@
             <notebook>
               <page string="Description">
                 <group>
-                  <field name="description"/>
+                  <field name="description" />
                   <field name="total_area"/>
                   <field name="bedrooms"/>
                   <field name="living_area"/>
                   <field name="facades"/>
                   <field name="garage"/>
                   <field name="garden"/>
-                  <field name="garden_area"/>
-                  <field name="garden_orientation"/>
+                  <field name="garden_area" invisible="not garden"/>
+                  <field name="garden_orientation" invisible="not garden"/>
                   <field name="state"/>
                   <field name="active"/>
                 </group>
@@ -74,7 +75,7 @@
                 </group>
               </page>
               <page string="Offers">
-                <field name="offer_ids" />
+                <field name="offer_ids" readonly="state in ('offer_accepted', 'sold', 'canceled')" />
               </page>
             </notebook>
           </sheet>
@@ -97,7 +98,7 @@
           <field name="property_type_id"/>
           <field name="tag_ids" widget="many2many_tags"/>
 
-          <filter name="available_state" string="Available Properties"
+          <filter name="available_properties" string="Available Properties"
                   domain="[('state','in',('new',('offer_received')))]" />
 
           <filter name="is_garden" string="Garden" domain="[('garden','=','True')]" />
@@ -112,6 +113,7 @@
       <field name="name">Properties</field>
       <field name="res_model">estate.property</field>
       <field name="view_mode">list,form</field>
+      <field name="context">{'search_default_available_properties': 1}</field>
     </record>
   </data>
 </odoo>
