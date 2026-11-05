@@ -66,3 +66,10 @@ class EstatePropertyOffer(models.Model):
      )
 
      _order = "price desc"
+
+     property_type_id = fields.Many2one(
+          "estate.property.type",
+          string="Property Type",
+          related="property_id.property_type_id",
+          store=True,
+     )

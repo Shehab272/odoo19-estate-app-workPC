@@ -124,3 +124,4 @@ class EstateProperty(models.Model):
                     )
 
      _order = "id desc"
+
