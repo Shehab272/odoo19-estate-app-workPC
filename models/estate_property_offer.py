@@ -73,3 +73,30 @@ class EstatePropertyOffer(models.Model):
           related="property_id.property_type_id",
           store=True,
      )
+
+     @api.model_create_multi
+     def create(self, vals_list):
+          for vals in vals_list:
+               property_id = vals.get('property_id')
+
+               if property_id:
+                    property_obj = self.env['estate.property'].browse(property_id)
+
+                    existing_prices = property_obj.offer_ids.mapped('price')
+
+                    if existing_prices:
+                         max_price = max(existing_prices)
+
+                         if vals.get('price', 0.0) < max_price:
+                              raise UserError(
+                                   "The offer amount cannot be lower "
+                                   "than an existing offer!"
+                              )
+
+          offers = super().create(vals_list)
+
+          for offer in offers:
+               offer.property_id.state = 'offer_received'
+
+          return offers
+

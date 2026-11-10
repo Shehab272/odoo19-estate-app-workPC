@@ -31,6 +31,7 @@ Long description of module's purpose
         'views/estate_property_offer.xml',
         'views/estate_property_type_views.xml',
         'views/estate_property_tag_views.xml',
+        'views/res_user.xml',
         'views/estate_menus.xml',
     ],
     # only loaded in demonstration mode

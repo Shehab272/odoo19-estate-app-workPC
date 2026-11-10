@@ -125,3 +125,12 @@ class EstateProperty(models.Model):
 
      _order = "id desc"
 
+     @api.ondelete(at_uninstall=False)
+     def _check_delete_property(self):
+          for record in self:
+               if record.state not in ['canceled', 'new']:
+                    raise UserError("You can only delete properties that are in 'New' or 'Cancelled' status.")
+
+
+
+
